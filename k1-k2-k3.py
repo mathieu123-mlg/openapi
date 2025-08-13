@@ -47,6 +47,19 @@ def serialize_posts():
 def list_posts():
     return JSONResponse(content=serialize_posts(), status_code=200, media_type="application/json")
 
+@app.put("/posts")
+def create_or_update_posts(payload: List[Post]):
+    for new_post in payload:
+        found = False
+        for i, existing_post in enumerate(post_stored):
+            if existing_post.title == new_post.title:
+                post_stored[i] = new_post
+                break
+        if not found:
+            post_stored.append(new_post)
+    return JSONResponse(content=serialize_posts(), status_code=201, media_type="application/json")
+
+
 
 @app.get("/ping/auth")
 def ping_auth(request: Request):
