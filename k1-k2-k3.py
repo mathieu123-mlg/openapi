@@ -12,3 +12,9 @@ def hello():
 @app.get("/home")
 def home():
     return Response("<html><body><h1>Welcome home!</h1></body></html>", status_code=200, media_type="text/html")
+
+
+@app.get("/{full_path:path}")
+def catch_all(full_path: str):
+    return Response(content="<html><body><h1>404 NOT FOUND</h1></body></html>", status_code=404
+                    , media_type="text/html")
