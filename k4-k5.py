@@ -3,6 +3,7 @@ from typing import List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 
 app = FastAPI()
@@ -39,6 +40,18 @@ def create_students(students_payload: List[Student]):
 
 @app.get("/students")
 def read_students():
+    students_as_json = []
+    for s in students_store:
+        students_as_json.append(s.model_dump())
+    return JSONResponse(content=students_as_json, status_code=200, media_type="application/json")
+
+
+@app.get("/students-authorized")
+def read_authorized_students(request: Request):
+    auth_header = request.headers.get("Authorization")
+    if not auth_header or not auth_header == 'bon courage':
+        return JSONResponse(status_code=401, content={"detail": f"Invalid authorization header provided {auth_header}"},
+                            media_type="application/json")
     students_as_json = []
     for s in students_store:
         students_as_json.append(s.model_dump())
