@@ -1,8 +1,9 @@
-from datetime import datetime
+import base64
 from typing import List
 
 from fastapi import FastAPI
 from pydantic import BaseModel
+from starlette.requests import Request
 from starlette.responses import Response, JSONResponse
 
 app = FastAPI()
@@ -45,6 +46,24 @@ def serialize_posts():
 @app.get("/posts")
 def list_posts():
     return JSONResponse(content=serialize_posts(), status_code=200, media_type="application/json")
+
+
+@app.get("/ping/auth")
+def ping_auth(request: Request):
+    admin_encoded_base64 = credentials_encoded()
+    authorization_header = request.headers.get("Authorization")
+    if not authorization_header or not authorization_header == f"Basic {admin_encoded_base64}":
+        return JSONResponse(content="Invalid Authorization header", status_code=401)
+    return Response(content="pong", status_code=200, media_type="text/plain")
+
+
+def credentials_encoded():
+    username = "admin"
+    password = "123456"
+    to_encode = username + ":" + password
+    text_bytes = to_encode.encode("utf-8")
+    encoded = base64.b64encode(text_bytes)
+    return encoded.decode("utf-8")
 
 
 @app.get("/{full_path:path}")
