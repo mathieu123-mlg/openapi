@@ -46,6 +46,19 @@ def read_students():
     return JSONResponse(content=students_as_json, status_code=200, media_type="application/json")
 
 
+@app.put("/students")
+def create_or_update_students(students_payload: List[Student]):
+    for new_student in students_payload:
+        found = False
+        for i, existing_student in enumerate(students_store):
+            if existing_student.reference == new_student.reference:
+                students_store[i] = new_student
+                break
+        if not found:
+            students_store.append(new_student)
+    return JSONResponse(content=students_store, status_code=201, media_type="application/json")
+
+
 @app.get("/students-authorized")
 def read_authorized_students(request: Request):
     auth_header = request.headers.get("Authorization")
