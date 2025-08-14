@@ -54,6 +54,7 @@ def create_or_update_posts(payload: List[Post]):
         for i, existing_post in enumerate(post_stored):
             if existing_post.title == new_post.title:
                 post_stored[i] = new_post
+                found = True
                 break
         if not found:
             post_stored.append(new_post)

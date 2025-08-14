@@ -53,6 +53,7 @@ def create_or_update_students(students_payload: List[Student]):
         for i, existing_student in enumerate(students_store):
             if existing_student.reference == new_student.reference:
                 students_store[i] = new_student
+                found = True
                 break
         if not found:
             students_store.append(new_student)
