@@ -1,0 +1,28 @@
+openapi: 3.1.0
+info:
+  title: Mon Post API
+  description: Correction examen k1-k2
+  version: 1.0.0
+servers:
+  - url: 'http:localhost:8000'
+paths:
+  /ping:
+    get:
+      responses:
+        '200':
+          description: "OK"
+          content:
+            text/plain:
+              schema:
+                type: string
+                example: "pong"
+  /home:
+    get:
+      responses:
+        '200':
+          description: "OK"
+          content:
+            text/html:
+              schema:
+                format: html
+                example: "<html><body><h1>Welcome home!</h1></body></html>"
