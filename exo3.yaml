@@ -1,0 +1,172 @@
+openapi: 3.1.0
+info:
+  title: Exercice 3
+  description: Définir un modèle et plusieurs opérations
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000'
+paths:
+  /tasks:
+    get:
+      summary: Récupère toutes les tâches
+      responses:
+        '200':
+          description: Liste des tâches récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
+    post:
+      summary: Crée de nouvelles tâches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/TaskInput'
+      responses:
+        '201':
+          description: Tâches créées avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+
+    delete:
+      summary: Supprime plusieurs tâches
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                ids:
+                  type: array
+                  items:
+                    type: integer
+                  description: Liste des IDs des tâches à supprimer
+              required:
+                - ids
+      responses:
+        '200':
+          description: Tâches supprimées avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Task'
+        '404':
+          description: Une ou plusieurs tâches non trouvées
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /tasks/{id}:
+    get:
+      summary: Récupère une tâche par son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de la tâche
+      responses:
+        '200':
+          description: Tâche récupérée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Tâche non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+    delete:
+      summary: Supprime une tâche par son ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID de la tâche à supprimer
+      responses:
+        '200':
+          description: Tâche supprimée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+        '404':
+          description: Tâche non trouvée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Task:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+          description: Identifiant unique de la tâche
+        title:
+          type: string
+          description: Titre de la tâche
+        completed:
+          type: boolean
+          description: Statut d'achèvement de la tâche
+      required:
+        - id
+        - title
+        - completed
+      example:
+        id: 1
+        title: "Faire les courses"
+        completed: false
+
+    TaskInput:
+      type: object
+      properties:
+        id:
+          type: integer
+          default: 1
+          description: Identifiant unique de la tâche
+        title:
+          type: string
+          description: Titre de la tâche
+        completed:
+          type: boolean
+          description: Statut d'achèvement de la tâche
+          default: false
+      required:
+        - title
+
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: Message d'erreur
+      required:
+        - message
+      example:
+        message: "Task not found"
+

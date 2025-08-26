@@ -1,0 +1,394 @@
+openapi: 3.1.0
+info:
+  title: Exercice 6
+  description: API de gestion des profils utilisateurs avec schémas complexes
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000'
+
+paths:
+  /users:
+    post:
+      summary: Crée une liste d'utilisateurs
+      description: Crée de nouveaux utilisateurs sans identifiants (générés automatiquement)
+      tags:
+        - Users
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/CreateUserProfile'
+            examples:
+              createUsers:
+                summary: Exemple de création d'utilisateurs
+                value:
+                  - first_name: "Jean"
+                    last_name: "Dupont"
+                    birthdate: "1990-05-15"
+                    email: "jean.dupont@email.com"
+                    address:
+                      street: "123 Rue Principale"
+                      city: "Paris"
+                      country: "France"
+                      postal_code: "75001"
+                    preferences:
+                      needs_newsletter: true
+                      language: "fr"
+                  - first_name: "Marie"
+                    last_name: "Martin"
+                    birthdate: "1985-12-20"
+                    email: "marie.martin@email.com"
+                    address:
+                      street: "456 Avenue Centrale"
+                      city: "Lyon"
+                      country: "France"
+                      postal_code: "69002"
+                    preferences:
+                      needs_newsletter: false
+                      language: "fr"
+      responses:
+        '201':
+          description: Utilisateurs créés avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/UserProfile'
+              examples:
+                createdUsers:
+                  summary: Utilisateurs créés avec leurs identifiants
+                  value:
+                    - identifier: "user-001"
+                      first_name: "Jean"
+                      last_name: "Dupont"
+                      birthdate: "1990-05-15"
+                      email: "jean.dupont@email.com"
+                      address:
+                        street: "123 Rue Principale"
+                        city: "Paris"
+                        country: "France"
+                        postal_code: "75001"
+                      preferences:
+                        needs_newsletter: true
+                        language: "fr"
+                    - identifier: "user-002"
+                      first_name: "Marie"
+                      last_name: "Martin"
+                      birthdate: "1985-12-20"
+                      email: "marie.martin@email.com"
+                      address:
+                        street: "456 Avenue Centrale"
+                        city: "Lyon"
+                        country: "France"
+                        postal_code: "69002"
+                      preferences:
+                        needs_newsletter: false
+                        language: "fr"
+
+  /users/{id}:
+    get:
+      summary: Récupère un utilisateur par son identifiant
+      description: Retourne toutes les informations d'un utilisateur
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      responses:
+        '200':
+          description: Utilisateur récupéré avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserProfile'
+              examples:
+                userProfile:
+                  summary: Profil utilisateur complet
+                  value:
+                    identifier: "user-001"
+                    first_name: "Jean"
+                    last_name: "Dupont"
+                    birthdate: "1990-05-15"
+                    email: "jean.dupont@email.com"
+                    address:
+                      street: "123 Rue Principale"
+                      city: "Paris"
+                      country: "France"
+                      postal_code: "75001"
+                    preferences:
+                      needs_newsletter: true
+                      language: "fr"
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                notFound:
+                  summary: Utilisateur non trouvé
+                  value:
+                    message: "User not found"
+
+  /users/{id}/personalInfo:
+    put:
+      summary: Met à jour les informations personnelles d'un utilisateur
+      description: Met à jour uniquement les informations personnelles (nom, prénom, date de naissance, email)
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PersonalInfo'
+            examples:
+              updatePersonalInfo:
+                summary: Mise à jour des informations personnelles
+                value:
+                  first_name: "Jean-Pierre"
+                  last_name: "Dupont-Martin"
+                  birthdate: "1990-05-16"
+                  email: "jeanpierre.dupont@email.com"
+      responses:
+        '200':
+          description: Informations personnelles mises à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PersonalInfo'
+              examples:
+                updatedPersonalInfo:
+                  summary: Informations personnelles mises à jour
+                  value:
+                    first_name: "Jean-Pierre"
+                    last_name: "Dupont-Martin"
+                    birthdate: "1990-05-16"
+                    email: "jeanpierre.dupont@email.com"
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{id}/address:
+    put:
+      summary: Met à jour l'adresse d'un utilisateur
+      description: Met à jour uniquement l'adresse de l'utilisateur
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Address'
+            examples:
+              updateAddress:
+                summary: Mise à jour de l'adresse
+                value:
+                  street: "789 Boulevard Nouveau"
+                  city: "Marseille"
+                  country: "France"
+                  postal_code: "13001"
+      responses:
+        '200':
+          description: Adresse mise à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Address'
+              examples:
+                updatedAddress:
+                  summary: Adresse mise à jour
+                  value:
+                    street: "789 Boulevard Nouveau"
+                    city: "Marseille"
+                    country: "France"
+                    postal_code: "13001"
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /users/{id}/preferences:
+    put:
+      summary: Met à jour les préférences d'un utilisateur
+      description: Met à jour uniquement les préférences de l'utilisateur
+      tags:
+        - Users
+      parameters:
+        - $ref: '#/components/parameters/userId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Preferences'
+            examples:
+              updatePreferences:
+                summary: Mise à jour des préférences
+                value:
+                  needs_newsletter: false
+                  language: "eng"
+      responses:
+        '200':
+          description: Préférences mises à jour avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Preferences'
+              examples:
+                updatedPreferences:
+                  summary: Préférences mises à jour
+                  value:
+                    needs_newsletter: false
+                    language: "eng"
+        '404':
+          description: Utilisateur non trouvé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    UserProfile:
+      type: object
+      required:
+        - identifier
+        - first_name
+        - last_name
+        - birthdate
+        - email
+        - address
+        - preferences
+      properties:
+        identifier:
+          type: string
+          description: Identifiant unique de l'utilisateur
+          example: "user-001"
+        first_name:
+          $ref: '#/components/schemas/PersonalInfo/properties/first_name'
+        last_name:
+          $ref: '#/components/schemas/PersonalInfo/properties/last_name'
+        birthdate:
+          $ref: '#/components/schemas/PersonalInfo/properties/birthdate'
+        email:
+          $ref: '#/components/schemas/PersonalInfo/properties/email'
+        address:
+          $ref: '#/components/schemas/Address'
+        preferences:
+          $ref: '#/components/schemas/Preferences'
+
+    CreateUserProfile:
+      allOf:
+        - $ref: '#/components/schemas/PersonalInfo'
+        - type: object
+          required:
+            - address
+            - preferences
+          properties:
+            address:
+              $ref: '#/components/schemas/Address'
+            preferences:
+              $ref: '#/components/schemas/Preferences'
+
+    PersonalInfo:
+      type: object
+      required:
+        - first_name
+        - last_name
+        - birthdate
+        - email
+      properties:
+        first_name:
+          type: string
+          description: Prénom de l'utilisateur
+          example: "Jean"
+        last_name:
+          type: string
+          description: Nom de famille de l'utilisateur
+          example: "Dupont"
+        birthdate:
+          type: string
+          format: date
+          description: Date de naissance de l'utilisateur
+          example: "1990-05-15"
+        email:
+          type: string
+          format: email
+          description: Adresse email de l'utilisateur
+          example: "jean.dupont@email.com"
+
+    Address:
+      type: object
+      required:
+        - street
+        - city
+        - country
+        - postal_code
+      properties:
+        street:
+          type: string
+          description: Rue et numéro
+          example: "123 Rue Principale"
+        city:
+          type: string
+          description: Ville
+          example: "Paris"
+        country:
+          type: string
+          description: Pays
+          example: "France"
+        postal_code:
+          type: string
+          pattern: '^\d+$'
+          description: Code postal (chiffres uniquement)
+          example: "75001"
+
+    Preferences:
+      type: object
+      required:
+        - needs_newsletter
+        - language
+      properties:
+        needs_newsletter:
+          type: boolean
+          description: Indique si l'utilisateur souhaite recevoir la newsletter
+          example: true
+        language:
+          type: string
+          enum: [mg, fr, eng]
+          description: Langue préférée de l'utilisateur
+          example: "fr"
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Message d'erreur
+          example: "User not found"
+
+  parameters:
+    userId:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Identifiant unique de l'utilisateur
+      example: "user-001"

@@ -1,0 +1,265 @@
+openapi: 3.1.0
+info:
+  title: Exercice 5
+  description: API avec authentification et tags
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000'
+
+paths:
+  /products:
+    get:
+      summary: Recherche des produits
+      description: Retourne une liste de produits filtrés selon les critères de recherche
+      tags:
+        - Products
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/q'
+      responses:
+        '200':
+          description: Liste des produits récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                multipleProducts:
+                  summary: Résultat avec plusieurs produits
+                  value:
+                    - name: "Lait frais"
+                      expiration_datetime: "2025-08-28T10:30:00Z"
+                      price: 2.99
+                    - name: "Pain complet"
+                      expiration_datetime: "2025-08-26T08:00:00Z"
+                      price: 1.50
+                emptyList:
+                  summary: Résultat avec liste vide
+                  value: []
+
+  /orders:
+    get:
+      summary: Liste paginée des commandes
+      description: Retourne une liste paginée de toutes les commandes
+      tags:
+        - Orders
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/size'
+      responses:
+        '200':
+          description: Liste des commandes récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  page:
+                    type: integer
+                    description: Numéro de la page actuelle
+                  size:
+                    type: integer
+                    description: Taille de la page
+                  total:
+                    type: integer
+                    description: Nombre total de commandes
+                  orders:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Order'
+              examples:
+                ordersList:
+                  summary: Liste paginée de commandes
+                  value:
+                    page: 1
+                    size: 10
+                    total: 25
+                    orders:
+                      - identifier: 1001
+                        customer_name: "Jean Dupont"
+                        creation_datetime: "2025-08-25T14:30:00Z"
+                        total_amount: 45.99
+                      - identifier: 1002
+                        customer_name: "Marie Martin"
+                        creation_datetime: "2025-08-25T15:45:00Z"
+                        total_amount: 32.50
+
+    post:
+      summary: Créer une nouvelle commande
+      description: Crée une nouvelle commande (authentification requise)
+      tags:
+        - Orders
+      security:
+        - BasicAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderInput'
+            examples:
+              newOrder:
+                summary: Exemple de création de commande
+                value:
+                  customer_name: "Pierre Durand"
+                  total_amount: 67.80
+      responses:
+        '201':
+          description: Commande créée avec succès
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Order'
+              examples:
+                createdOrder:
+                  summary: Commande créée
+                  value:
+                    identifier: 1003
+                    customer_name: "Pierre Durand"
+                    creation_datetime: "2025-08-25T16:20:00Z"
+                    total_amount: 67.80
+        '401':
+          description: Non autorisé - Authentification requise
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                unauthorized:
+                  summary: Erreur d'authentification
+                  value:
+                    message: "Authentication required"
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - expiration_datetime
+        - price
+      properties:
+        name:
+          type: string
+          description: Nom du produit
+          example: "Yaourt nature"
+        expiration_datetime:
+          type: string
+          format: date-time
+          description: Date et heure d'expiration du produit
+          example: "2025-08-30T12:00:00Z"
+        price:
+          type: number
+          format: float
+          description: Prix du produit en euros
+          example: 1.75
+
+    Order:
+      type: object
+      required:
+        - identifier
+        - customer_name
+        - creation_datetime
+        - total_amount
+      properties:
+        identifier:
+          type: integer
+          format: int64
+          description: Identifiant unique de la commande
+          example: 1001
+        customer_name:
+          type: string
+          description: Nom du client
+          example: "Jean Dupont"
+        creation_datetime:
+          type: string
+          format: date-time
+          description: Date et heure de création de la commande
+          example: "2025-08-25T14:30:00Z"
+        total_amount:
+          type: number
+          format: float
+          description: Montant total de la commande en euros
+          example: 45.99
+
+    OrderInput:
+      type: object
+      required:
+        - customer_name
+        - total_amount
+      properties:
+        customer_name:
+          type: string
+          description: Nom du client
+          example: "Jean Dupont"
+        total_amount:
+          type: number
+          format: float
+          description: Montant total de la commande en euros
+          example: 45.99
+
+    Error:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Message d'erreur
+          example: "Authentication required"
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: Nombre maximum d'éléments à retourner
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+      example: 5
+
+    q:
+      name: q
+      in: query
+      description: Terme de recherche pour filtrer les produits par nom
+      required: false
+      schema:
+        type: string
+      example: "lait"
+
+    page:
+      name: page
+      in: query
+      description: Numéro de la page à récupérer
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        default: 1
+      example: 1
+
+    size:
+      name: size
+      in: query
+      description: Nombre d'éléments par page
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+      example: 10
+
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Authentification basique requise pour créer des commandes

@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: Exercice 4
+  description: Recherche de produits
+  version: 1.0.0
+servers:
+  - url: 'http://localhost:8000'
+
+paths:
+  /products:
+    get:
+      summary: Recherche des produits
+      description: Retourne une liste de produits filtrés selon les critères de recherche
+      parameters:
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/q'
+      responses:
+        '200':
+          description: Liste des produits récupérée avec succès
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+              examples:
+                multipleProducts:
+                  summary: Résultat avec plusieurs produits
+                  value:
+                    - name: "Lait frais"
+                      expiration_datetime: "2025-08-28T10:30:00Z"
+                      price: 2.99
+                    - name: "Pain complet"
+                      expiration_datetime: "2025-08-26T08:00:00Z"
+                      price: 1.50
+                    - name: "Fromage blanc"
+                      expiration_datetime: "2025-08-30T14:45:00Z"
+                      price: 3.25
+                emptyList:
+                  summary: Résultat avec liste vide
+                  value: []
+
+components:
+  schemas:
+    Product:
+      type: object
+      required:
+        - name
+        - expiration_datetime
+        - price
+      properties:
+        name:
+          type: string
+          description: Nom du produit
+          example: "Yaourt nature"
+        expiration_datetime:
+          type: string
+          format: date-time
+          description: Date et heure d'expiration du produit
+          example: "2025-08-30T12:00:00Z"
+        price:
+          type: number
+          format: float
+          description: Prix du produit en euros
+          example: 1.75
+
+  parameters:
+    limit:
+      name: limit
+      in: query
+      description: Nombre maximum d'éléments à retourner
+      required: false
+      schema:
+        type: integer
+        format: int32
+        minimum: 1
+        maximum: 100
+        default: 10
+      example: 5
+
+    q:
+      name: q
+      in: query
+      description: Terme de recherche pour filtrer les produits par nom
+      required: false
+      schema:
+        type: string
+      example: "lait"
