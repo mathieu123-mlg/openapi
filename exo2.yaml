@@ -27,11 +27,11 @@ paths:
             type: integer
             minimum: 1
             maximum: 100
-            default: 20
-            example: 20
+            default: 10
+            example: 10
       responses:
         '200':
-          description: Liste des utilisateurs retrouvés
+          description: OK
           content:
             application/json:
               schema:
@@ -40,22 +40,16 @@ paths:
                   $ref: '#/components/schemas/User'
               example:
                 - id: 1
-                  name: "Alice"
-                  email: "alice@gmail.com"
+                  name: "Mathieu"
+                  email: "mathieu@gmail.com"
                 - id: 2
                   name: "Bob"
                   email: "bob@gmail.com"
                 - id: 3
                   name: "Charlie"
                   email: "charlie@gmail.com"
-                - id: 4
-                  name: "Diana"
-                  email: "diana@gmail.com"
-                - id: 5
-                  name: "Eve"
-                  email: "eve@gmail.com"
         '400':
-          description: Mauvais types de paramètres fournis
+          description: BAD REQUEST
           content:
             application/json:
               schema:
@@ -79,12 +73,12 @@ components:
         name:
           type: string
           description: Nom complet de l'utilisateur
-          example: "Alice"
+          example: "Mathieu"
         email:
           type: string
           format: email
           description: Adresse email de l'utilisateur
-          example: "alice@gmail.com"
+          example: "mathieu@gmail.com"
 
     Error:
       type: object
